@@ -13,11 +13,14 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,7 +29,8 @@ class MainActivity : ComponentActivity() {
             InfoDayTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    Greeting("Android")
+//                    Greeting("Android")
+                    ScaffoldScreen()
                 }
             }
         }
@@ -38,12 +42,29 @@ class MainActivity : ComponentActivity() {
 fun ScaffoldScreen() {
     var selectedItem by remember { mutableStateOf(0) }
     val items = listOf("Home", "Events", "Itin", "Map", "Info")
+    val navController = rememberNavController()
 
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("HKBU InfoDay App") }
+                title = { Text("HKBU InfoDay App") },
+                navigationIcon = {
+                    val navBackStackEntry by navController.currentBackStackEntryAsState()
+
+                    if (navBackStackEntry?.arguments?.getBoolean("topLevel") == false) {
+                        IconButton(
+                            onClick = { navController.navigateUp() }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowBack,
+                                contentDescription = "Back"
+                            )
+                        }
+                    } else {
+                        null
+                    }
+                }
             )
         },
         bottomBar = { NavigationBar {
@@ -61,8 +82,8 @@ fun ScaffoldScreen() {
                 modifier = Modifier.padding(innerPadding),
             ) {
                 when (selectedItem) {
-                    0 -> InfoScreen()
-                    1 -> InfoScreen()
+                    0 -> DeptNav(navController)
+                    1 -> DeptNav(navController)
                     2 -> InfoScreen()
                     3 -> InfoScreen()
                     4 -> InfoScreen()
