@@ -1,15 +1,12 @@
 package com.example.infoday
 
-import android.media.Image
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.infoday.ui.theme.InfoDayTheme
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -17,10 +14,9 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.infoday.KtorClient.getFeeds
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +39,12 @@ fun ScaffoldScreen() {
     var selectedItem by remember { mutableStateOf(0) }
     val items = listOf("Home", "Events", "Itin", "Map", "Info")
     val navController = rememberNavController()
-
+    val feeds = produceState(
+        initialValue = listOf<Feed>(),
+        producer = {
+            value = getFeeds()
+        }
+    )
 
     Scaffold(
         topBar = {
@@ -82,10 +83,11 @@ fun ScaffoldScreen() {
                 modifier = Modifier.padding(innerPadding),
             ) {
                 when (selectedItem) {
-                    0 -> DeptNav(navController)
+                    0 -> FeedScreen(feeds.value)
+
                     1 -> DeptNav(navController)
                     2 -> InfoScreen()
-                    3 -> InfoScreen()
+                    3 -> MapScreen()
                     4 -> InfoScreen()
                 }
             }

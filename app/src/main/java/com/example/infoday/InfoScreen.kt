@@ -1,6 +1,8 @@
 package com.example.infoday
 
+import android.content.Intent
 import android.media.Image
+import android.net.Uri
 import androidx.compose.runtime.Composable
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -11,6 +13,7 @@ import androidx.compose.ui.semantics.Role.Companion.Image
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.infoday.ui.theme.InfoDayTheme
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
@@ -18,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
@@ -78,10 +82,19 @@ fun InfoScreen() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhoneList() {
+    val ctx = LocalContext.current
+
+
+
     Column {
         Contact.data.forEach { message ->
             ListItem(
                 headlineText = { Text(message.office) },
+                modifier = Modifier.clickable {
+                    val u = Uri.parse("tel:" + message.tel)
+                    val i = Intent(Intent.ACTION_DIAL, u)
+                    ctx.startActivity(i)
+                },
                 leadingContent = {
                     Icon(
                         Icons.Filled.Call,
