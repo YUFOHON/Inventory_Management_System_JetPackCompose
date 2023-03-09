@@ -3,7 +3,6 @@ package com.example.infoday
 import android.content.Intent
 import android.media.Image
 import android.net.Uri
-import androidx.compose.runtime.Composable
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -19,14 +18,19 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 
 //@Composable
 //fun InfoGreeting() {
@@ -76,6 +80,8 @@ fun InfoScreen() {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         InfoGreeting()
         PhoneList()
+        SettingList()
+
     }
 }
 
@@ -105,4 +111,37 @@ fun PhoneList() {
             )
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SettingList() {
+    val dataStore = UserPreferences(LocalContext.current)
+    val coroutineScope = rememberCoroutineScope()
+
+    val checked by dataStore.getMode.collectAsState(initial = false)
+//    var checked by remember { mutableStateOf(true) }
+
+    ListItem(
+        headlineText = { Text("Dark Mode") },
+        leadingContent = {
+            Icon(
+                Icons.Filled.Settings,
+                contentDescription = null
+            )
+        },
+        trailingContent = {
+            Switch(
+                modifier = Modifier.semantics { contentDescription = "Demo" },
+//                checked = checked,
+                checked = checked ?: true,
+
+                onCheckedChange = {
+//                    checked = it
+                    coroutineScope.launch {
+                        dataStore.saveMode(it)
+                    }
+                })
+        }
+    )
 }
