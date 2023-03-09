@@ -24,7 +24,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             InfoDayTheme {
                 // A surface container using the 'background' color from the theme
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
 //                    Greeting("Android")
                     ScaffoldScreen()
                 }
@@ -35,40 +38,41 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScaffoldScreen() {
-    var selectedItem by remember { mutableStateOf(0) }
-    val items = listOf("Home", "Events", "Itin", "Map", "Info")
-    val navController = rememberNavController()
-    val feeds = produceState(
-        initialValue = listOf<Feed>(),
-        producer = {
-            value = getFeeds()
-        }
-    )
+Scaffold(
+topBar = {
+    fun ScaffoldScreen() {
+        var selectedItem by remember { mutableStateOf(0) }
+        val items = listOf("Home", "Events", "Itin", "Map", "Info")
+        val navController = rememberNavController()
+        val feeds = produceState(
+            initialValue = listOf<Feed>(),
+            producer = {
+                value = getFeeds()
+            }
+        )
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text("HKBU InfoDay App") },
-                navigationIcon = {
-                    val navBackStackEntry by navController.currentBackStackEntryAsState()
+        TopAppBar(
+            title = { Text("HKBU InfoDay App") },
+            navigationIcon = {
+                val navBackStackEntry by navController.currentBackStackEntryAsState()
 
-                    if (navBackStackEntry?.arguments?.getBoolean("topLevel") == false) {
-                        IconButton(
-                            onClick = { navController.navigateUp() }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.ArrowBack,
-                                contentDescription = "Back"
-                            )
-                        }
-                    } else {
-                        null
+                if (navBackStackEntry?.arguments?.getBoolean("topLevel") == false) {
+                    IconButton(
+                        onClick = { navController.navigateUp() }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
                     }
+                } else {
+                    null
                 }
-            )
-        },
-        bottomBar = { NavigationBar {
+            }
+        )
+    },
+    bottomBar = {
+        NavigationBar {
             items.forEachIndexed { index, item ->
                 NavigationBarItem(
                     icon = { Icon(Icons.Filled.Favorite, contentDescription = item) },
@@ -77,21 +81,22 @@ fun ScaffoldScreen() {
                     onClick = { selectedItem = index }
                 )
             }
-        }},
-        content = { innerPadding ->
-            Column(
-                modifier = Modifier.padding(innerPadding),
-            ) {
-                when (selectedItem) {
-                    0 -> FeedScreen(feeds.value)
+        }
+    },
+    content = { innerPadding ->
+        Column(
+            modifier = Modifier.padding(innerPadding),
+        ) {
+            when (selectedItem) {
+                0 -> FeedScreen(feeds.value)
 
-                    1 -> DeptNav(navController)
-                    2 -> InfoScreen()
-                    3 -> MapScreen()
-                    4 -> InfoScreen()
-                }
+                1 -> DeptNav(navController)
+                2 -> InfoScreen()
+                3 -> MapScreen()
+                4 -> InfoScreen()
             }
         }
+    }
     )
 }
 
