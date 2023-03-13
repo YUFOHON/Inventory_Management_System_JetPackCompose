@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.infoday.ui.theme.InfoDayTheme
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
@@ -46,7 +47,7 @@ import kotlinx.coroutines.launch
 @Preview(showBackground = true)
 @Composable
 fun InfoPreview() {
-    InfoDayTheme {
+    InfoDayTheme(darkTheme = isSystemInDarkTheme()) {
         InfoScreen()
     }
 }
@@ -89,9 +90,6 @@ fun InfoScreen() {
 @Composable
 fun PhoneList() {
     val ctx = LocalContext.current
-
-
-
     Column {
         Contact.data.forEach { message ->
             ListItem(

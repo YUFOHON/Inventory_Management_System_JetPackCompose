@@ -1,6 +1,7 @@
 package com.example.infoday
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -46,7 +47,7 @@ fun DeptScreen(navController: NavHostController) {
     }
 }
 @Composable
-fun DeptNav(navController: NavHostController) {
+fun DeptNav(navController: NavHostController, snackbarHostState: SnackbarHostState) {
 
     NavHost(
         navController = navController,
@@ -54,8 +55,11 @@ fun DeptNav(navController: NavHostController) {
     ) {
         composable("dept") { DeptScreen(navController) }
 //        composable("event") { EventScreen() }
+//        composable("event/{deptId}") { backStackEntry ->
+//            EventScreen(backStackEntry.arguments?.getString("deptId"))
+//        }
         composable("event/{deptId}") { backStackEntry ->
-            EventScreen(backStackEntry.arguments?.getString("deptId"))
+            EventScreen(snackbarHostState, backStackEntry.arguments?.getString("deptId"))
         }
 
     }
@@ -64,8 +68,8 @@ fun DeptNav(navController: NavHostController) {
 @Preview(showBackground = true)
 @Composable
 fun DeptPreview() {
-    InfoDayTheme {
+    InfoDayTheme() {
 //        DeptScreen()
-        DeptNav(rememberNavController())
+//        DeptNav(rememberNavController())
     }
 }

@@ -1,6 +1,7 @@
 package com.example.infoday
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
@@ -62,7 +63,7 @@ fun FeedScreen(feeds: List<Feed>) {
 @Preview(showBackground = true)
 @Composable
 fun FeedPreview() {
-    InfoDayTheme {
+    InfoDayTheme(darkTheme = isSystemInDarkTheme()) {
         FeedScreen(Feed.data)
     }
 }

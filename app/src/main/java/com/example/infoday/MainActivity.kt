@@ -28,6 +28,7 @@ class MainActivity : ComponentActivity() {
             val mode by dataStore.getMode.collectAsState(initial = false)
             print(mode)
             InfoDayTheme(darkTheme = mode ?: false) {
+//            InfoDayTheme(darkTheme = true) {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -47,6 +48,8 @@ fun ScaffoldScreen() {
     var selectedItem by remember { mutableStateOf(0) }
     val items = listOf("Home", "Events", "Itin", "Map", "Info")
     val navController = rememberNavController()
+    val snackbarHostState = remember { SnackbarHostState() }
+
     val feeds = produceState(
         initialValue = listOf<Feed>(),
         producer = {
@@ -55,6 +58,8 @@ fun ScaffoldScreen() {
     )
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+
         topBar = {
             TopAppBar(
                 title = { Text("HKBU InfoDay App") },
@@ -88,15 +93,16 @@ fun ScaffoldScreen() {
                 }
             }
         },
+
         content = { innerPadding ->
             Column(
                 modifier = Modifier.padding(innerPadding),
             ) {
+
                 when (selectedItem) {
                     0 -> FeedScreen(feeds.value)
-
-                    1 -> DeptNav(navController)
-                    2 -> InfoScreen()
+                    1 -> DeptNav(navController, snackbarHostState)
+                    2 ->  ItinerarytScreen(snackbarHostState)
                     3 -> MapScreen()
                     4 -> InfoScreen()
                 }
@@ -113,7 +119,7 @@ fun Greeting(name: String) {
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-    InfoDayTheme {
+    InfoDayTheme{
         ScaffoldScreen()
     }
 }
