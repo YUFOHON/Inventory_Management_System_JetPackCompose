@@ -104,7 +104,7 @@ fun ScaffoldScreen() {
                     1 -> DeptNav(navController, snackbarHostState)
                     2 ->  ItinerarytScreen(snackbarHostState)
                     3 -> MapScreen()
-                    4 -> InfoScreen()
+                    4 -> InfoScreen(snackbarHostState)
                 }
             }
         }

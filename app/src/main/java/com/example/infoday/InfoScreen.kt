@@ -31,7 +31,9 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
 
 //@Composable
 //fun InfoGreeting() {
@@ -44,11 +46,37 @@ import kotlinx.coroutines.launch
 //    }
 //    }
 
-@Preview(showBackground = true)
+//@Preview(showBackground = true)
+//@Composable
+//fun InfoPreview() {
+//    InfoDayTheme(darkTheme = isSystemInDarkTheme()) {
+//        InfoScreen()
+//    }
+//}
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InfoPreview() {
-    InfoDayTheme(darkTheme = isSystemInDarkTheme()) {
-        InfoScreen()
+fun FeedBack(snackbarHostState: SnackbarHostState) {
+    val padding = 16.dp
+    var message by remember { mutableStateOf("") }
+    val coroutineScope = rememberCoroutineScope()
+
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        TextField(
+            maxLines = 1,
+            value = message,
+            onValueChange = { message = it }
+        )
+        Spacer(Modifier.size(padding))
+
+        Button(onClick = {
+            coroutineScope.launch {
+                val stringBody: String = KtorClient.postFeedback(message)
+                snackbarHostState.showSnackbar(stringBody)
+            }
+        }) {
+            Text(text = "Submit feedback")
+        }
     }
 }
 
@@ -60,7 +88,7 @@ fun InfoGreeting() {
         Image(
             painter = painterResource(id = R.drawable.hkbu_logo),
             contentDescription = stringResource(id = R.string.hkbu_logo),
-            modifier = Modifier.size(240.dp)
+            modifier = Modifier.size(200.dp)
         )
         Spacer(Modifier.size(padding))
         Text(text = "HKBU InfoDay App", fontSize = 30.sp)
@@ -76,13 +104,14 @@ data class Contact(val office: String, val tel: String) {
         )
     }
 }
+
 @Composable
-fun InfoScreen() {
+fun InfoScreen(snackbarHostState: SnackbarHostState) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         InfoGreeting()
         PhoneList()
         SettingList()
-
+        FeedBack(snackbarHostState)
     }
 }
 
