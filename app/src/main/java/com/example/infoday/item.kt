@@ -33,6 +33,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.infoday.KtorClient.borrow
+import com.example.infoday.KtorClient.consume
 import com.example.infoday.KtorClient.firstname
 import com.example.infoday.KtorClient.getBook
 //import com.example.infoday.KtorClient.getFeeds
@@ -85,10 +86,6 @@ fun itemScreen(
     val listState = rememberLazyListState()
     LazyColumn(state = listState) {
         items(itemsList.value) { item ->
-            // convert the item to correspond class object
-            // then tell the compiler the item is a class object which must have item.title
-            //if type ==book then item as Book etc...
-
             val itemID = when (item) {
                 is Game -> item._id
                 is Book -> item._id
@@ -148,12 +145,9 @@ fun itemScreen(
                 },
 
                 trailingContent = {
-//                    Text("More")
-//                    Log.d("itemScreen", "subtitle: $subtitle")
-                    //print the fitstname and lastname
-//                    Log.d("itemScreen", "firstname: $firstname lastname: $lastname")
+//                    sbeceril0@unc.edu
                     if (item is Game || item is Book) {
-                        if (borrower == "none")
+                        if (borrower == "none"||borrower=="")
                             IconButton(onClick = {
                                 coroutineScope.launch {
                                     snackbarHostState.showSnackbar(
@@ -201,7 +195,22 @@ fun itemScreen(
                         }
                     } else {
                         if (remainning> 0)
-                            IconButton(onClick = { /* Handle button click */ }) {
+                            IconButton(onClick = { coroutineScope.launch {
+                                snackbarHostState.showSnackbar(
+                                    "start processing."
+                                )
+
+                                if (consume(itemID as String)) {
+                                    snackbarHostState.showSnackbar(
+                                        "Consume successfully."
+                                    )
+                                    remainning -= 1
+                                } else
+                                    snackbarHostState.showSnackbar(
+                                        "Consume failed."
+                                    )
+                            }
+                            }) {
                                 Icon(Icons.Default.Favorite, contentDescription = "Favorite")
                             }
                     }
@@ -235,15 +244,28 @@ fun LazyListState.OnBottomReached(
     loadMore: () -> Unit
 ) {
     // state object which tells us if we should load more
+//    val shouldLoadMore = remember {
+//        derivedStateOf {
+//            // get last visible item
+//            val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
+//                ?:
+//                // list is empty
+//                // return false here if loadMore should not be invoked if the list is empty
+//                return@derivedStateOf true
+//
+//            // Check if last visible item is the last item in the list
+//            lastVisibleItem.index == layoutInfo.totalItemsCount - 1
+//        }
+//    }
     val shouldLoadMore = remember {
         derivedStateOf {
 
-            // get last visible item
-            val lastVisibleItem = layoutInfo.visibleItemsInfo.lastOrNull()
-                ?:
-                // list is empty
-                // return false here if loadMore should not be invoked if the list is empty
-                return@derivedStateOf true
+            // get last visible item if layout information is available
+            val lastVisibleItem = if (layoutInfo.visibleItemsInfo.isNotEmpty()) {
+                layoutInfo.visibleItemsInfo.lastOrNull()
+            } else {
+                null
+            } ?: return@derivedStateOf false
 
             // Check if last visible item is the last item in the list
             lastVisibleItem.index == layoutInfo.totalItemsCount - 1

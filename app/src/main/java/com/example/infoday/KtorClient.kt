@@ -15,6 +15,7 @@ import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.*
+import org.json.JSONArray
 
 //@Serializable
 @Serializable
@@ -75,6 +76,19 @@ object KtorClient {
             Log.d("borrow", "response: $response")
         } catch (e: Exception) {
             Log.d("borrowErr", "error: $e")
+        }
+        return false
+    }
+
+    suspend fun consume(id: String): Boolean {
+        try {
+            val response: HttpResponse =
+                httpClient.post("http://comp4107.herokuapp.com/user/consume/$id").body()
+            if (response.status.value == 200)
+                return true
+            Log.d("consume", "response: $response")
+        } catch (e: Exception) {
+            Log.d("consumeErr", "error: $e")
         }
         return false
     }
@@ -140,18 +154,28 @@ object KtorClient {
         return emptyList()
     }
 
-    suspend fun search(keyword: String): List<InventoryItem> {
+    suspend fun search(keyword: String,page:Int): List<InventoryItem> {
         try {
+            //lOG THE PAGE
+            Log.d("search", "page: $page")
+            val result = mutableListOf<InventoryItem>()
             val response: HttpResponse =
-                httpClient.get("http://comp4107.herokuapp.com/inventory?keyword=$keyword")
+                httpClient.get("http://comp4107.herokuapp.com/inventory?keyword=$keyword&page=$page")
             val responseBody: String = response.bodyAsText()
+            val jsonArray = JSONArray(responseBody)
             val json = Json { ignoreUnknownKeys = true }
-            val item = json.decodeFromString(InventoryItemSerializer(), responseBody)
-            return listOf(item)
-        } catch (e: Exception) {
-            throw RuntimeException("Failed to search inventory item with keyword $keyword", e)
-        }
 
+            for (i in 0 until jsonArray.length()) {
+//                val item = json.decodeFromString<InventoryItem>(jsonArray[i].toString())
+                val item = json.decodeFromString(InventoryItemSerializer(), jsonArray[i].toString())
+                result.add(item)
+            }
+//            val item = json.decodeFromString(InventoryItemSerializer(), response.body())
+            return result
+        } catch (e: Exception) {
+            Log.d("search", "error: $e")
+        }
+        return emptyList()
     }
 
 }
