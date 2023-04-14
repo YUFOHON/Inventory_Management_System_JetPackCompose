@@ -86,13 +86,13 @@ fun LoginNav(navController: NavHostController, snackbarHostState: SnackbarHostSt
         }
         composable("profile") {
 
-            ProfileScreen()
+            ProfileScreen(navController = navController)
         }
     }
 }
 
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(navController: NavHostController) {
 //show text "you successfully logged in" at the middle of screen
     val context: Context = LocalContext.current
     val videoUri = getVideoUri()
@@ -122,6 +122,16 @@ fun ProfileScreen() {
             fontWeight = FontWeight.Bold,
             color = Color.White
         )
+    }
+    //ADD a logout button that remove the token adn navigate to login screen
+    //the button located at the bottom of the screen
+    Button(onClick = {
+        KtorClient.token = ""
+        navController.navigate("login")
+    }
+    ) {
+        Text(text = "Logout")
+
     }
 }
 

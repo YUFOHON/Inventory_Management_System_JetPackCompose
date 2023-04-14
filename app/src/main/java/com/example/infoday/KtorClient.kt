@@ -16,6 +16,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.*
 import org.json.JSONArray
+import java.net.URLEncoder
 
 //@Serializable
 @Serializable
@@ -69,6 +70,8 @@ object KtorClient {
         try {
             //print the token
 //            Log.d("token", "token: $token")
+            if(token.isEmpty())
+                return false
             val response: HttpResponse =
                 httpClient.post("http://comp4107.herokuapp.com/user/borrow/$id").body()
             if (response.status.value == 200)
@@ -82,6 +85,9 @@ object KtorClient {
 
     suspend fun consume(id: String): Boolean {
         try {
+            if(token.isEmpty())
+                return false
+
             val response: HttpResponse =
                 httpClient.post("http://comp4107.herokuapp.com/user/consume/$id").body()
             if (response.status.value == 200)
@@ -157,14 +163,13 @@ object KtorClient {
     suspend fun search(keyword: String,page:Int): List<InventoryItem> {
         try {
             //lOG THE PAGE
-            Log.d("search", "page: $page")
+            val encodedQuery = URLEncoder.encode(keyword, "UTF-8")
             val result = mutableListOf<InventoryItem>()
             val response: HttpResponse =
-                httpClient.get("http://comp4107.herokuapp.com/inventory?keyword=$keyword&page=$page")
+                httpClient.get("http://comp4107.herokuapp.com/inventory?keyword=$encodedQuery&page=$page")
             val responseBody: String = response.bodyAsText()
             val jsonArray = JSONArray(responseBody)
             val json = Json { ignoreUnknownKeys = true }
-
             for (i in 0 until jsonArray.length()) {
 //                val item = json.decodeFromString<InventoryItem>(jsonArray[i].toString())
                 val item = json.decodeFromString(InventoryItemSerializer(), jsonArray[i].toString())

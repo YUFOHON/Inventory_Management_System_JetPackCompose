@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun SearchScreen(snackbarHostState: SnackbarHostState) {
     var page = remember { mutableStateOf(1) }
-    val updatedPage= rememberUpdatedState(page)
+    val updatedPage = rememberUpdatedState(page)
     var searchQuery by remember { mutableStateOf("") }
     var searchResult by remember { mutableStateOf(emptyList<InventoryItem>()) }
     val coroutineScope = rememberCoroutineScope()
@@ -43,7 +43,7 @@ fun SearchScreen(snackbarHostState: SnackbarHostState) {
                     snackbarHostState.showSnackbar(
                         "start processing."
                     )
-//                    page.value = 0
+                    page.value = 1
                     searchResult = search(searchQuery, page.value)
 
                 }
@@ -56,7 +56,9 @@ fun SearchScreen(snackbarHostState: SnackbarHostState) {
         val listState = rememberLazyListState()
         LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
             items(searchResult) { result ->
+
                 when (result.type) {
+
                     "book" -> Book(result, coroutineScope, snackbarHostState)
                     "game" -> Game(result, coroutineScope, snackbarHostState)
                     "gift" -> Gift(result, coroutineScope, snackbarHostState)
@@ -73,7 +75,6 @@ fun SearchScreen(snackbarHostState: SnackbarHostState) {
                 )
                 page.value += 1
                 searchResult += search(searchQuery, page.value)
-
                 snackbarHostState.showSnackbar(
                     "Loaded successfully."
                 )
@@ -153,8 +154,14 @@ fun Game(
 ) {
 //convert the result to the correct type based on the type field
     val result = result as Game
+
     var borrower by remember { mutableStateOf(result.borrower) }
     val updatedBorrower = rememberUpdatedState(borrower)
+//    log the borrower value
+    Log.i("Borrower", borrower)
+    Log.i("Result_borrower", result.borrower)
+    Log.i("updatedBorrower", updatedBorrower.value)
+    borrower = result.borrower
     Column(modifier = Modifier.padding(16.dp)) {
         Text(text = result.title, fontWeight = FontWeight.Bold)
         Text(text = result.description)
